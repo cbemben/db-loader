@@ -12,7 +12,7 @@ def snowflake_connector(func):
         	  	warehouse=os.environ['SNOWFLAKE_WAREHOUSE'],
         	  	database=os.environ['SNOWFLAKE_DB'],
         	  	schema=os.environ['SNOWFLAKE_SCHEMA'],
-        	  	#authenticator='externalbrowser')
+        	  	authenticator='externalbrowser')
         try:
             rv = func(con, *args,**kwargs)
         except Exception:
