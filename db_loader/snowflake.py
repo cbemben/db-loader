@@ -5,14 +5,14 @@ import os
 def snowflake_connector(func):
     def with_connection_(*args,**kwargs):
         con = snowflake.connector.connect(
-        	  	user=os.environ('SNOWFLAKE_USER'),
-        	  	password=os.environ('SNOWFLAKE_PWD'),
-        	  	account=os.environ('SNOWFLAKE_ACCT'),
-        	  	role=os.environ('SNOWFLAKE_ROLE'),
-        	  	warehouse=os.environ('SNOWFLAKE_WAREHOUSE'),
-        	  	database=os.eviron('SNOWFLAKE_DB'),
-        	  	schema='',
-        	  	authentication='')
+        	  	user=os.environ['SNOWFLAKE_USER'],
+        	  	password=os.environ['SNOWFLAKE_PWD'],
+        	  	account=os.environ['SNOWFLAKE_ACCT'],
+        	  	role=os.environ['SNOWFLAKE_ROLE'],
+        	  	warehouse=os.environ['SNOWFLAKE_WAREHOUSE'],
+        	  	database=os.environ['SNOWFLAKE_DB'],
+        	  	schema=os.environ['SNOWFLAKE_SCHEMA'],
+        	  	authentication='oauth')
         try:
             rv = func(con, *args,**kwargs)
         except Exception:
@@ -22,7 +22,8 @@ def snowflake_connector(func):
         else:
             con.commit()
         finally:
-            con.close()
+        	print("closing connection to snowflake")
+        	con.close()
         return rv
     return with_connection_
 
@@ -30,5 +31,9 @@ def snowflake_connector(func):
 
 
 @snowflake_connector
-def test_connection():
-	conn.cursor().execute('select current_version()')
+def test_connection(con):
+	cur = con.cursor()
+	print("connected to snowflake")
+	cur.execute("SELECT current_version()")
+	ret = cur.fetchone()
+	print(ret)
