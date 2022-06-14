@@ -1,6 +1,7 @@
 import snowflake.connector
 import logging
 import os
+from pathlib import Path
 
 def snowflake_connector(func):
     def with_connection_(*args,**kwargs):
@@ -28,24 +29,28 @@ def snowflake_connector(func):
         return rv
     return with_connection_
 
-
-
-
-@snowflake_connector
-def test_connection(con):
-	cur = con.cursor()
-	print("connected to snowflake")
-	cur.execute("SELECT current_version()")
-	ret = cur.fetchone()
-	print(ret)
+def get_dirs(path: str):
+    """Get generator object of all sub-directories
+    :param path str: Parent directory
+    """
+    return pathlib.Path(path).iterdir()
 
 def get_dir_files(dir_path: str):
-    #return list of files with full path
+    file_paths_for_upload = []
+    folders = Path(dir_path)
+    for folder in folders.iterdir():
+        if not str(folder).endswith('.DS_Store'):
+            files = Path(folder)
+            for file in files.iterdir():
+                file_paths_for_upload.append(str(file))
+    return file_paths_for_upload
 
 def put_files_into_snowflake(con, file):
+    raise NotImplementedError
     #put file into snowflake
 
 @snowflake_connector
 def recurse_over_files(con):
+    raise NotImplementedError
     #x = get_dir_files
     #loop over x in put_files_into_snowflake
