@@ -6,13 +6,13 @@ def snowflake_connector(func):
     def with_connection_(*args,**kwargs):
         con = snowflake.connector.connect(
         	  	user=os.environ['SNOWFLAKE_USER'],
-        	  	password=os.environ['SNOWFLAKE_PWD'],
+        	  	#password=os.environ['SNOWFLAKE_PWD'],
         	  	account=os.environ['SNOWFLAKE_ACCT'],
         	  	role=os.environ['SNOWFLAKE_ROLE'],
         	  	warehouse=os.environ['SNOWFLAKE_WAREHOUSE'],
         	  	database=os.environ['SNOWFLAKE_DB'],
         	  	schema=os.environ['SNOWFLAKE_SCHEMA'],
-        	  	authentication='oauth')
+        	  	authenticator='externalbrowser')
         try:
             rv = func(con, *args,**kwargs)
         except Exception:
