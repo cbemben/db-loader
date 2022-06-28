@@ -8,13 +8,13 @@ def snowflake_connector(func):
     def with_connection_(*args,**kwargs):
         con = snowflake.connector.connect(
         	  	user=os.environ['SNOWFLAKE_USER'],
-        	  	password=os.environ['SNOWFLAKE_PWD'],
+        	  	#password=os.environ['SNOWFLAKE_PWD'],
         	  	account=os.environ['SNOWFLAKE_ACCT'],
         	  	role=os.environ['SNOWFLAKE_ROLE'],
         	  	warehouse=os.environ['SNOWFLAKE_WAREHOUSE'],
         	  	database=os.environ['SNOWFLAKE_DB'],
-        	  	schema=os.environ['SNOWFLAKE_SCHEMA']
-        	  	#authenticator='externalbrowser'
+        	  	schema=os.environ['SNOWFLAKE_SCHEMA'],
+        	  	authenticator='externalbrowser'
                 )
         try:
             rv = func(con, *args,**kwargs)
@@ -37,14 +37,34 @@ def get_config_value(section: str, key: str) -> str:
 
 def get_list_of_files():
     dir_path = get_config_value(section="DirectoryPath",key="Directory")
-    dir_name = get_config_value(section="FilePaths", key="OncSnap")
+    dir_name = get_config_value(section="FilePaths", key="RadiologyEpisodes")
     full_path = dir_path + dir_name
     list_of_files = list(Path(full_path).glob('*.*'))
-    return [str(i) for i in list_of_files]
+    return list_of_files
+
+def get_diff_list_of_files():
+    incoming_files = [str(i) for i in get_list_of_files()]
+    files_in_snowflake = get_list_of_files_in_stage()
+    z = []
+    for i in incoming_files:
+        for j in files_in_snowflake:
+            if i.endswith(j):
+                z.append(i)
+    scope = set(incoming_files).difference(set(z))            
+    return list(scope)
+
+@snowflake_connector
+def get_list_of_files_in_stage(con):
+    snowflake_stage_name = get_config_value("SnowflakeStage","NAMED_STAGE_1")
+    query = 'select distinct metadata$filename from ' + snowflake_stage_name
+    print(query)
+    cur = con.cursor()
+    cur.execute(query)
+    return list(cur.fetch_pandas_all()['METADATA$FILENAME'])
 
 @snowflake_connector
 def push_to_snowflake_stage(con, snowflake_stage_name: str = None):
-    list_of_files = get_list_of_files()
+    list_of_files = get_diff_list_of_files()
     snowflake_stage_name = get_config_value("SnowflakeStage","NAMED_STAGE_1")
     for i in list_of_files:
         x = "PUT 'file://" + i + "' " + snowflake_stage_name
