@@ -30,9 +30,9 @@ def snowflake_connector(func):
         return rv
     return with_connection_
 
-def get_config_value(section: str, key: str) -> str:
+def get_config_value(section: str, key: str, config_path: str = 'config.ini') -> str:
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read(config_path)
     return config[section][key]
 
 def get_list_of_files():
