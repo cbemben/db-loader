@@ -16,7 +16,7 @@ subdirectory_desc_2=subdirectory_name_2/
 subdirectory_desc_3=subdirectory_name_3/
 
 [SnowflakeStage]
-NAMED_STAGE_1= __The name of the Snowflake Named Stage including @ symbol (example: @MY_STAGE)__
+NAMED_STAGE_1=@MY_STAGE (The name of the Snowflake Named Stage including @ symbol)
 ```
 
 ## To Run
