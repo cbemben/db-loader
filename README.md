@@ -8,7 +8,7 @@ Create a `config.ini` file in the `db_loader` directory with the following struc
 
 ```console
 [DirectoryPath]
-Directory=__path to the directory containing sub-directories which contain individual files__
+Directory=/path/to/the/directory/containing/sub-directories/which/contain/individual/files
 
 [FilePaths]
 subdirectory_desc_1=subdirectory_name_1/
@@ -16,7 +16,7 @@ subdirectory_desc_2=subdirectory_name_2/
 subdirectory_desc_3=subdirectory_name_3/
 
 [SnowflakeStage]
-NAMED_STAGE_1=__The name of the Snowflake Named Stage including @ symbol (example: @MY_STAGE)__
+NAMED_STAGE_1= __The name of the Snowflake Named Stage including @ symbol (example: @MY_STAGE)__
 ```
 
 ## To Run
