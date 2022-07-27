@@ -2,6 +2,7 @@ import snowflake.connector
 import sys
 import os
 import configparser
+import logging
 from pathlib import Path
 
 def snowflake_connector(func):
@@ -45,7 +46,7 @@ def get_list_of_files():
     """ Returns a list of individual filenames that are present in the target directory
     """
     dir_path = get_config_value(section="DirectoryPath",key="Directory")
-    dir_name = get_config_value(section="FilePaths", key="MedicalEpisodes")
+    dir_name = get_config_value(section="FilePaths", key="SurgicalAsset")
     full_path = dir_path + dir_name
     list_of_files = list(Path(full_path).glob('*.*'))
     return list_of_files
@@ -83,7 +84,7 @@ def push_to_snowflake_stage(con, snowflake_stage_name: str = None):
     list_of_files = get_diff_list_of_files()
     snowflake_stage_name = get_config_value("SnowflakeStage","NAMED_STAGE_1")
     for i in list_of_files:
-        if sys.platform is 'win32':
+        if sys.platform == 'win32':
             x = "PUT 'file://" + Path(i).as_posix() + "' " + snowflake_stage_name
         else:
             x = "PUT 'file://" + i + "' " + snowflake_stage_name
